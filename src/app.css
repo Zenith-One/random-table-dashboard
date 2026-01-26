@@ -1,0 +1,86 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+:root {
+	--primary: #7c3aed;
+	--primary-dark: #6d28d9;
+	--bg: #0f172a;
+	--bg-secondary: #1e293b;
+	--bg-tertiary: #334155;
+	--text: #f1f5f9;
+	--text-secondary: #cbd5e1;
+	--border: #475569;
+	--success: #10b981;
+	--danger: #ef4444;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+	background: var(--bg);
+	color: var(--text);
+	line-height: 1.6;
+	min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin-bottom: 1rem;
+	font-weight: 600;
+}
+
+button {
+	font-family: inherit;
+	cursor: pointer;
+	border: none;
+	background: var(--primary);
+	color: white;
+	padding: 0.75rem 1.5rem;
+	border-radius: 0.5rem;
+	font-size: 1rem;
+	font-weight: 500;
+	transition: background 0.2s;
+	/* Better touch targets for iPad */
+	min-height: 44px;
+	min-width: 44px;
+}
+
+button:hover {
+	background: var(--primary-dark);
+}
+
+button:active {
+	transform: scale(0.98);
+}
+
+input, textarea, select {
+	font-family: inherit;
+	padding: 0.75rem;
+	border: 1px solid var(--border);
+	border-radius: 0.5rem;
+	background: var(--bg-secondary);
+	color: var(--text);
+	font-size: 1rem;
+	width: 100%;
+	/* Better touch targets for iPad */
+	min-height: 44px;
+}
+
+input:focus, textarea:focus, select:focus {
+	outline: 2px solid var(--primary);
+	outline-offset: 2px;
+}
+
+/* Responsive container */
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 1rem;
+}
+
+@media (min-width: 768px) {
+	.container {
+		padding: 1rem;
+	}
+}
