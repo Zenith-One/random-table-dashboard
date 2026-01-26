@@ -10,11 +10,21 @@ const config = {
 			assets: 'build',
 			fallback: undefined,
 			precompress: false,
-			strict: true
+			strict: false
 		}),
 		paths: {
 			// Update this with your GitHub repo name
 			base: process.env.NODE_ENV === 'production' ? '/random-table-dashboard' : ''
+		},
+		prerender: {
+			handleHttpError: ({ path, message }) => {
+				// Ignore favicon 404s and other missing static assets
+				if (path.includes('favicon')) {
+					return;
+				}
+				// Throw for other errors
+				throw new Error(message);
+			}
 		}
 	}
 };

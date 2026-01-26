@@ -8,8 +8,8 @@
 			<nav>
 				<h1>🎲 TTRPG Random Tables</h1>
 				<div class="nav-links">
-					<a href="/">Dashboards</a>
-					<a href="/tables">All Tables</a>
+					<a href="./">Dashboards</a>
+					<a href="./tables">All Tables</a>
 				</div>
 			</nav>
 		</div>
