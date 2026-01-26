@@ -33,13 +33,6 @@
 
 	// Get dice icon based on the table's dice formula
 	function getDiceIconPath(): string {
-		if (!table.diceFormula) return d6Icon;
-
-		const match = table.diceFormula.match(/d(\d+)/i);
-		if (!match) return d6Icon;
-
-		const sides = match[1];
-
 		// Map dice types to icon paths
 		const diceIcons: { [key: string]: string } = {
 			'4': d4Icon,
@@ -50,6 +43,16 @@
 			'20': d20Icon,
 			'100': d10Icon  // fallback to d6 for d100
 		};
+
+		if (!table.diceFormula) {
+			let icon = diceIcons[''+table.entries.length];
+			return icon || d6Icon;
+		};
+
+		const match = table.diceFormula.match(/d(\d+)/i);
+		if (!match) return d6Icon;
+
+		const sides = match[1];
 
 		return diceIcons[sides] || d6Icon;
 	}
