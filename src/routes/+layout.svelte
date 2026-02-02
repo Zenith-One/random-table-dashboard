@@ -1,5 +1,8 @@
 <script>
 	import '../app.css';
+	import ImportExportDialog from '$lib/components/ImportExportDialog.svelte';
+
+	let showImportExport = false;
 </script>
 
 <div class="app">
@@ -10,6 +13,9 @@
 				<div class="nav-links">
 					<a href="./">Dashboards</a>
 					<a href="./tables">All Tables</a>
+					<button class="import-export-button" on:click={() => (showImportExport = true)}>
+						💾 Backup
+					</button>
 				</div>
 			</nav>
 		</div>
@@ -27,6 +33,10 @@
 		</div>
 	</footer>
 </div>
+
+{#if showImportExport}
+	<ImportExportDialog onClose={() => (showImportExport = false)} />
+{/if}
 
 <style>
 	.app {
@@ -71,6 +81,27 @@
 	}
 
 	.nav-links a:hover {
+		background: var(--bg-tertiary);
+		color: var(--text);
+	}
+
+	.import-export-button {
+		background: transparent;
+		border: none;
+		color: var(--text-secondary);
+		text-decoration: none;
+		padding: 0.5rem 1rem;
+		border-radius: 0.5rem;
+		transition: all 0.2s;
+		min-height: 44px;
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+		font-size: 1rem;
+		font-family: inherit;
+	}
+
+	.import-export-button:hover {
 		background: var(--bg-tertiary);
 		color: var(--text);
 	}

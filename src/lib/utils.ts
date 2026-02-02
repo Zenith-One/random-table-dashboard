@@ -64,3 +64,84 @@ export function rollTable(table: RandomTable): { roll: number; entry: RandomTabl
 export function generateId(): string {
 	return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
+
+/**
+ * Export app data as JSON with metadata
+ */
+export function exportAppData(tables: RandomTable[], dashboards: any[]): string {
+	const exportData = {
+		version: '1.0',
+		exportDate: new Date().toISOString(),
+		appName: 'TTRPG Random Tables',
+		data: {
+			tables,
+			dashboards
+		}
+	};
+	return JSON.stringify(exportData, null, 2);
+}
+
+/**
+ * Download data as a JSON file
+ */
+export function downloadJSON(data: string, filename: string) {
+	const blob = new Blob([data], { type: 'application/json' });
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement('a');
+	link.href = url;
+	link.download = filename;
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	URL.revokeObjectURL(url);
+}
+
+/**
+ * Validate imported JSON data structure
+ */
+export function validateImportData(data: any): { valid: boolean; error?: string } {
+	// Check if data is an object
+	if (typeof data !== 'object' || data === null) {
+		return { valid: false, error: 'Invalid JSON: data must be an object' };
+	}
+
+	// Check required fields
+	if (!data.version) {
+		return { valid: false, error: 'Missing version field' };
+	}
+
+	if (!data.data) {
+		return { valid: false, error: 'Missing data field' };
+	}
+
+	if (!data.data.tables || !Array.isArray(data.data.tables)) {
+		return { valid: false, error: 'Invalid or missing tables array' };
+	}
+
+	if (!data.data.dashboards || !Array.isArray(data.data.dashboards)) {
+		return { valid: false, error: 'Invalid or missing dashboards array' };
+	}
+
+	// Validate table structure
+	for (const table of data.data.tables) {
+		if (!table.id || !table.name || !Array.isArray(table.entries)) {
+			return { valid: false, error: 'Invalid table structure: missing id, name, or entries' };
+		}
+
+		// Validate entries have columns array
+		for (const entry of table.entries) {
+			if (!entry.id || !Array.isArray(entry.columns)) {
+				return { valid: false, error: 'Invalid table entry: missing id or columns' };
+			}
+		}
+	}
+
+	// Validate dashboard structure
+	for (const dashboard of data.data.dashboards) {
+		if (!dashboard.id || !dashboard.name || !Array.isArray(dashboard.tableIds)) {
+			return { valid: false, error: 'Invalid dashboard structure: missing id, name, or tableIds' };
+		}
+	}
+
+	return { valid: true };
+}

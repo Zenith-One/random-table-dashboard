@@ -79,3 +79,97 @@ export function updateDashboard(id: string, updates: Partial<Dashboard>) {
 export function deleteDashboard(id: string) {
 	dashboards.update(d => d.filter(dash => dash.id !== id));
 }
+
+// Helper to deep compare table content (excluding id and timestamps)
+function isTableContentDifferent(table1: RandomTable, table2: RandomTable): boolean {
+	if (table1.description !== table2.description) return true;
+	if (table1.diceFormula !== table2.diceFormula) return true;
+	if (JSON.stringify(table1.columnHeaders) !== JSON.stringify(table2.columnHeaders)) return true;
+	if (JSON.stringify(table1.entries) !== JSON.stringify(table2.entries)) return true;
+	return false;
+}
+
+// Helper to deep compare dashboard content (excluding id and timestamps)
+function isDashboardContentDifferent(dash1: Dashboard, dash2: Dashboard): boolean {
+	if (dash1.description !== dash2.description) return true;
+	if (JSON.stringify(dash1.tableIds) !== JSON.stringify(dash2.tableIds)) return true;
+	return false;
+}
+
+// Smart merge tables: compare by name, update if different, add if new
+export function smartMergeTables(newTables: RandomTable[]): { added: number; updated: number } {
+	let added = 0;
+	let updated = 0;
+
+	tables.update(currentTables => {
+		const result = [...currentTables];
+
+		for (const newTable of newTables) {
+			// Find existing table by name (case-insensitive)
+			const existingIndex = result.findIndex(
+				t => t.name.toLowerCase() === newTable.name.toLowerCase()
+			);
+
+			if (existingIndex >= 0) {
+				// Table exists - check if content is different
+				if (isTableContentDifferent(result[existingIndex], newTable)) {
+					// Update existing table, keep existing id and createdAt
+					result[existingIndex] = {
+						...newTable,
+						id: result[existingIndex].id,
+						createdAt: result[existingIndex].createdAt,
+						updatedAt: new Date().toISOString()
+					};
+					updated++;
+				}
+			} else {
+				// New table - add it
+				result.push(newTable);
+				added++;
+			}
+		}
+
+		return result;
+	});
+
+	return { added, updated };
+}
+
+// Smart merge dashboards: compare by name, update if different, add if new
+export function smartMergeDashboards(newDashboards: Dashboard[]): { added: number; updated: number } {
+	let added = 0;
+	let updated = 0;
+
+	dashboards.update(currentDashboards => {
+		const result = [...currentDashboards];
+
+		for (const newDashboard of newDashboards) {
+			// Find existing dashboard by name (case-insensitive)
+			const existingIndex = result.findIndex(
+				d => d.name.toLowerCase() === newDashboard.name.toLowerCase()
+			);
+
+			if (existingIndex >= 0) {
+				// Dashboard exists - check if content is different
+				if (isDashboardContentDifferent(result[existingIndex], newDashboard)) {
+					// Update existing dashboard, keep existing id and createdAt
+					result[existingIndex] = {
+						...newDashboard,
+						id: result[existingIndex].id,
+						createdAt: result[existingIndex].createdAt,
+						updatedAt: new Date().toISOString()
+					};
+					updated++;
+				}
+			} else {
+				// New dashboard - add it
+				result.push(newDashboard);
+				added++;
+			}
+		}
+
+		return result;
+	});
+
+	return { added, updated };
+}
