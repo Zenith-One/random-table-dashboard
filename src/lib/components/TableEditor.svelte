@@ -10,6 +10,7 @@
 	let tableDescription = table?.description || '';
 	let diceFormula = table?.diceFormula || '';
 	let columnHeaders = table?.columnHeaders?.join(', ') || '';
+	let tags = table?.tags?.join(', ') || '';
 	let entries: RandomTableEntry[] = table?.entries.map(e => ({ ...e })) || [];
 	let newEntryValue = '';
 	let csvInput = '';
@@ -84,12 +85,18 @@
 			? columnHeaders.split(',').map(h => h.trim()).filter(h => h.length > 0)
 			: undefined;
 
+		// Parse tags from comma-separated string
+		const parsedTags = tags.trim()
+			? tags.split(',').map(t => t.trim()).filter(t => t.length > 0)
+			: undefined;
+
 		const tableData: RandomTable = {
 			id: table?.id || generateId(),
 			name: tableName.trim(),
 			description: tableDescription.trim() || undefined,
 			diceFormula: diceFormula.trim() || undefined,
 			columnHeaders: parsedHeaders,
+			tags: parsedTags,
 			entries: entries,
 			createdAt: table?.createdAt || now,
 			updatedAt: now
@@ -253,6 +260,17 @@
 						placeholder="e.g., Item, Value, Rarity"
 					/>
 					<span class="hint">Comma-separated column names for multi-column tables</span>
+				</div>
+
+				<div class="form-group">
+					<label for="tags">Tags (optional)</label>
+					<input
+						id="tags"
+						type="text"
+						bind:value={tags}
+						placeholder="e.g., combat, treasure, NPC"
+					/>
+					<span class="hint">Comma-separated tags for organizing tables</span>
 				</div>
 			</div>
 

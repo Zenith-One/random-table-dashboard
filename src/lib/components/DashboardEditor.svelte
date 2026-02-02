@@ -7,6 +7,23 @@
 	export let onClose: () => void;
 
 	let currentTableIds = [...dashboard.tableIds];
+	let selectedColor = dashboard.color || '#7c3aed';
+	let selectedIcon = dashboard.icon || '';
+
+	// Predefined color palette
+	const colorOptions = [
+		'#7c3aed', // Purple (default)
+		'#3b82f6', // Blue
+		'#10b981', // Green
+		'#f59e0b', // Amber
+		'#ef4444', // Red
+		'#ec4899', // Pink
+		'#8b5cf6', // Violet
+		'#06b6d4', // Cyan
+	];
+
+	// Common emoji icons
+	const iconOptions = ['', '⚔️', '🛡️', '🏰', '🗡️', '🎲', '📜', '🔮', '💎', '🏹', '🧙', '🐉'];
 
 	$: availableTables = allTables.filter(t => !currentTableIds.includes(t.id));
 	$: selectedTables = allTables.filter(t => currentTableIds.includes(t.id))
@@ -35,7 +52,11 @@
 	}
 
 	function saveDashboard() {
-		updateDashboard(dashboard.id, { tableIds: currentTableIds });
+		updateDashboard(dashboard.id, {
+			tableIds: currentTableIds,
+			color: selectedColor,
+			icon: selectedIcon || undefined
+		});
 		onClose();
 	}
 </script>
@@ -48,6 +69,41 @@
 		</div>
 
 		<div class="editor-content">
+			<div class="section">
+				<h3>Dashboard Appearance</h3>
+				<div class="appearance-grid">
+					<div class="form-group">
+						<label>Color</label>
+						<div class="color-picker">
+							{#each colorOptions as color}
+								<button
+									class="color-option"
+									class:selected={selectedColor === color}
+									style="background-color: {color};"
+									on:click={() => (selectedColor = color)}
+									title={color}
+								/>
+							{/each}
+						</div>
+					</div>
+					<div class="form-group">
+						<label>Icon (optional)</label>
+						<div class="icon-picker">
+							{#each iconOptions as icon}
+								<button
+									class="icon-option"
+									class:selected={selectedIcon === icon}
+									on:click={() => (selectedIcon = icon)}
+									title={icon || 'None'}
+								>
+									{icon || '—'}
+								</button>
+							{/each}
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<div class="section">
 				<h3>Tables in Dashboard ({selectedTables.length})</h3>
 				{#if selectedTables.length === 0}
@@ -195,6 +251,89 @@
 		margin: 0 0 1rem 0;
 		font-size: 1.125rem;
 		color: var(--text);
+	}
+
+	.appearance-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.5rem;
+	}
+
+	.form-group {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.form-group label {
+		font-weight: 500;
+		color: var(--text);
+		font-size: 0.875rem;
+	}
+
+	.color-picker {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 0.5rem;
+	}
+
+	.color-option {
+		width: 100%;
+		aspect-ratio: 1;
+		border: 2px solid transparent;
+		border-radius: 0.5rem;
+		cursor: pointer;
+		transition: all 0.2s;
+		min-width: 44px;
+		min-height: 44px;
+	}
+
+	.color-option:hover {
+		transform: scale(1.1);
+	}
+
+	.color-option.selected {
+		border-color: var(--text);
+		box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--primary);
+	}
+
+	.icon-picker {
+		display: grid;
+		grid-template-columns: repeat(6, 1fr);
+		gap: 0.5rem;
+	}
+
+	.icon-option {
+		aspect-ratio: 1;
+		background: var(--bg-tertiary);
+		border: 2px solid var(--border);
+		border-radius: 0.5rem;
+		font-size: 1.25rem;
+		cursor: pointer;
+		transition: all 0.2s;
+		min-width: 44px;
+		min-height: 44px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.icon-option:hover {
+		background: var(--primary);
+		border-color: var(--primary);
+		transform: scale(1.1);
+	}
+
+	.icon-option.selected {
+		background: var(--primary);
+		border-color: var(--primary);
+		color: white;
+	}
+
+	@media (max-width: 768px) {
+		.appearance-grid {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.empty-message {

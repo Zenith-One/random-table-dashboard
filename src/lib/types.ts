@@ -11,6 +11,7 @@ export interface RandomTable {
 	entries: RandomTableEntry[];
 	diceFormula?: string; // e.g., "1d20", "2d6", etc.
 	columnHeaders?: string[]; // Optional column headers for multi-column tables
+	tags?: string[]; // Optional tags for categorization
 	createdAt: string;
 	updatedAt: string;
 }
@@ -20,6 +21,8 @@ export interface Dashboard {
 	name: string;
 	description?: string;
 	tableIds: string[]; // Array of table IDs to display on this dashboard
+	color?: string; // Hex color for visual differentiation
+	icon?: string; // Emoji icon for visual identification
 	createdAt: string;
 	updatedAt: string;
 }
@@ -29,5 +32,14 @@ export interface RollResult {
 	tableName: string;
 	roll: number;
 	result: string;
+	timestamp: string;
+}
+
+export interface RollHistoryEntry {
+	id: string;
+	tableId: string;
+	tableName: string;
+	roll: number;
+	columns: string[];
 	timestamp: string;
 }

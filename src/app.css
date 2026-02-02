@@ -84,3 +84,93 @@ input:focus, textarea:focus, select:focus {
 		padding: 1rem;
 	}
 }
+
+/* Print-friendly styles */
+@media print {
+	:root {
+		--bg: white;
+		--bg-secondary: white;
+		--bg-tertiary: #f9fafb;
+		--text: black;
+		--text-secondary: #6b7280;
+		--border: #d1d5db;
+		--primary: #7c3aed;
+	}
+
+	body {
+		background: white;
+		color: black;
+	}
+
+	/* Hide navigation, buttons, and interactive elements */
+	header,
+	footer,
+	button:not(.collapse-button),
+	.new-dashboard-button,
+	.new-table-button,
+	.action-button,
+	.create-button,
+	.import-export-button,
+	.dashboard-selector,
+	.dashboard-actions,
+	.table-actions,
+	.filters,
+	.roll-button,
+	.result-display,
+	.sidebar,
+	.roll-history {
+		display: none !important;
+	}
+
+	/* Improve table printing */
+	.table-card {
+		break-inside: avoid;
+		page-break-inside: avoid;
+		border: 1px solid #d1d5db;
+		margin-bottom: 1.5rem;
+	}
+
+	.tables-grid {
+		column-count: 1 !important;
+	}
+
+	table {
+		page-break-inside: avoid;
+	}
+
+	/* Show table in expanded state */
+	.table-card.collapsed {
+		padding: 1.5rem;
+	}
+
+	/* Ensure collapsed tables show content */
+	.table-card.collapsed .table-view,
+	.table-card.collapsed .description {
+		display: block !important;
+	}
+
+	/* Remove shadow effects */
+	.table-card,
+	.dialog,
+	.editor-modal {
+		box-shadow: none !important;
+	}
+
+	/* Optimize spacing for print */
+	.container {
+		max-width: 100%;
+		padding: 0.5rem;
+	}
+
+	h1 {
+		font-size: 1.5rem;
+	}
+
+	h2 {
+		font-size: 1.25rem;
+	}
+
+	h3 {
+		font-size: 1.125rem;
+	}
+}

@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
-import type { RandomTable, Dashboard } from './types';
+import type { RandomTable, Dashboard, RollHistoryEntry } from './types';
+import { generateId } from './utils';
 
 // Helper to migrate old table entries from value to columns
 function migrateTableEntry(entry: any): any {
@@ -50,6 +51,7 @@ function createLocalStorageStore<T>(key: string, initialValue: T) {
 // Stores
 export const tables = createLocalStorageStore<RandomTable[]>('tables', []);
 export const dashboards = createLocalStorageStore<Dashboard[]>('dashboards', []);
+export const rollHistory = createLocalStorageStore<RollHistoryEntry[]>('rollHistory', []);
 
 // Helper functions
 export function addTable(table: RandomTable) {
@@ -64,6 +66,23 @@ export function updateTable(id: string, updates: Partial<RandomTable>) {
 
 export function deleteTable(id: string) {
 	tables.update(t => t.filter(table => table.id !== id));
+}
+
+export function duplicateTable(id: string) {
+	tables.update(t => {
+		const table = t.find(table => table.id === id);
+		if (!table) return t;
+
+		const duplicatedTable: RandomTable = {
+			...table,
+			id: generateId(),
+			name: `${table.name} (Copy)`,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString()
+		};
+
+		return [...t, duplicatedTable];
+	});
 }
 
 export function addDashboard(dashboard: Dashboard) {
@@ -172,4 +191,23 @@ export function smartMergeDashboards(newDashboards: Dashboard[]): { added: numbe
 	});
 
 	return { added, updated };
+}
+
+// Roll history functions
+export function addRollToHistory(entry: Omit<RollHistoryEntry, 'id' | 'timestamp'>) {
+	const historyEntry: RollHistoryEntry = {
+		...entry,
+		id: generateId(),
+		timestamp: new Date().toISOString()
+	};
+
+	rollHistory.update(history => {
+		const newHistory = [historyEntry, ...history];
+		// Keep only the last 20 rolls
+		return newHistory.slice(0, 20);
+	});
+}
+
+export function clearRollHistory() {
+	rollHistory.set([]);
 }

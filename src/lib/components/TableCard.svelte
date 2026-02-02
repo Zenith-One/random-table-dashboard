@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { RandomTable } from '$lib/types';
 	import { rollTable } from '$lib/utils';
+	import { addRollToHistory } from '$lib/stores';
 
 	// Import dice SVG icons
 	import d4Icon from '../../assets/icons/ffffff/transparent/1x1/skoll/d4.svg';
@@ -11,10 +12,16 @@
 	import d20Icon from '../../assets/icons/ffffff/transparent/1x1/delapouite/dice-twenty-faces-twenty.svg';
 
 	export let table: RandomTable;
+	export let forceCollapsed: boolean | undefined = undefined;
 
 	let lastResult: { roll: number; columns: string[] } | null = null;
 	let isRolling = false;
 	let isCollapsed = false;
+
+	// React to external collapse control
+	$: if (forceCollapsed !== undefined) {
+		isCollapsed = forceCollapsed;
+	}
 
 	function handleRoll() {
 		isRolling = true;
@@ -23,6 +30,15 @@
 		setTimeout(() => {
 			const { roll, entry } = rollTable(table);
 			lastResult = { roll, columns: entry.columns };
+
+			// Add to roll history
+			addRollToHistory({
+				tableId: table.id,
+				tableName: table.name,
+				roll,
+				columns: entry.columns
+			});
+
 			isRolling = false;
 		}, 300);
 	}

@@ -2,9 +2,10 @@
 	import { onMount } from 'svelte';
 	import { dashboards, tables, addDashboard, deleteDashboard } from '$lib/stores';
 	import { sampleDashboards, sampleTables } from '$lib/sampleData';
-	import { generateId } from '$lib/utils';
+	import { generateId, getInactiveColor } from '$lib/utils';
 	import TableCard from '$lib/components/TableCard.svelte';
 	import DashboardEditor from '$lib/components/DashboardEditor.svelte';
+	import RollHistory from '$lib/components/RollHistory.svelte';
 	import type { Dashboard, RandomTable } from '$lib/types';
 
 	let currentDashboards: Dashboard[] = [];
@@ -14,6 +15,7 @@
 	let showNewDashboardDialog = false;
 	let newDashboardName = '';
 	let newDashboardDescription = '';
+	let allTablesCollapsed: boolean | undefined = undefined;
 
 	onMount(() => {
 		// Load sample data if stores are empty
@@ -80,6 +82,14 @@
 		deleteDashboard(selectedDashboard.id);
 		selectedDashboard = currentDashboards[0] || null;
 	}
+
+	function collapseAllTables() {
+		allTablesCollapsed = true;
+	}
+
+	function expandAllTables() {
+		allTablesCollapsed = false;
+	}
 </script>
 
 <div class="container">
@@ -106,8 +116,12 @@
 				<button
 					class="dashboard-tab"
 					class:active={selectedDashboard?.id === dashboard.id}
+					style="--dashboard-color: {dashboard.color || '#7c3aed'}; --inactive-color: {getInactiveColor(dashboard.color || '#7c3aed')}"
 					on:click={() => (selectedDashboard = dashboard)}
 				>
+					{#if dashboard.icon}
+						<span class="dashboard-icon">{dashboard.icon}</span>
+					{/if}
 					{dashboard.name}
 				</button>
 			{/each}
@@ -142,9 +156,23 @@
 						</button>
 					</div>
 				{:else}
+					<div class="roll-history-section">
+						<RollHistory />
+					</div>
+					<div class="tables-section-header">
+						<h3>Tables</h3>
+						<div class="collapse-controls">
+							<button class="control-button" on:click={expandAllTables}>
+								Expand All
+							</button>
+							<button class="control-button" on:click={collapseAllTables}>
+								Collapse All
+							</button>
+						</div>
+					</div>
 					<div class="tables-grid">
 						{#each dashboardTables as table (table.id)}
-							<TableCard {table} />
+							<TableCard {table} forceCollapsed={allTablesCollapsed} />
 						{/each}
 					</div>
 				{/if}
@@ -278,16 +306,23 @@
 		transition: all 0.2s;
 		font-size: 1rem;
 		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: var(--inactive-color);
 	}
 
+
 	.dashboard-tab:hover {
-		background: var(--bg-tertiary);
+		background: var(--dashboard-color, var(--primary));
+		/* background: var(--bg-tertiary); */
 		color: var(--text);
 	}
 
 	.dashboard-tab.active {
 		background: var(--bg-tertiary);
 		color: var(--text);
+		background: var(--dashboard-color, var(--primary));
 	}
 
 	.dashboard-tab.active::after {
@@ -297,7 +332,11 @@
 		left: 0;
 		right: 0;
 		height: 2px;
-		background: var(--primary);
+	}
+
+	.dashboard-icon {
+		font-size: 1.125rem;
+		line-height: 1;
 	}
 
 	.dashboard-content {
@@ -366,6 +405,48 @@
 		color: white;
 	}
 
+	.roll-history-section {
+		margin-bottom: 2rem;
+	}
+
+	.tables-section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1.5rem;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+
+	.tables-section-header h3 {
+		margin: 0;
+		font-size: 1.25rem;
+		color: var(--text);
+	}
+
+	.collapse-controls {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.control-button {
+		background: var(--bg-tertiary);
+		border: 1px solid var(--border);
+		color: var(--text);
+		padding: 0.5rem 1rem;
+		border-radius: 0.5rem;
+		font-size: 0.875rem;
+		min-height: 44px;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.control-button:hover {
+		background: var(--primary);
+		border-color: var(--primary);
+		color: white;
+	}
+
 	.tables-grid {
 		column-count: 1;
 		column-gap: 1.5rem;
@@ -379,8 +460,8 @@
 		margin-bottom: 1.5rem;
 	}
 
-	/* Large screens and up - 2 columns max */
-	@media (min-width: 1200px) {
+	/* Large screens - 2 columns for tables */
+	@media (min-width: 1400px) {
 		.tables-grid {
 			column-count: 2;
 			column-gap: 2rem;
