@@ -14,7 +14,7 @@
 
 	let lastResult: { roll: number; columns: string[] } | null = null;
 	let isRolling = false;
-	let showTable = false;
+	let isCollapsed = false;
 
 	function handleRoll() {
 		isRolling = true;
@@ -27,8 +27,8 @@
 		}, 300);
 	}
 
-	function toggleTable() {
-		showTable = !showTable;
+	function toggleCollapse() {
+		isCollapsed = !isCollapsed;
 	}
 
 	// Get dice icon based on the table's dice formula
@@ -58,26 +58,25 @@
 	}
 </script>
 
-<div class="table-card">
+<div class="table-card" class:collapsed={isCollapsed}>
 	<div class="card-header">
-		<h3>{table.name}</h3>
-		{#if table.diceFormula}
-			<span class="dice-badge">{table.diceFormula}</span>
-		{/if}
+		<div class="header-content">
+			<h3>{table.name}</h3>
+			{#if table.diceFormula}
+				<span class="dice-badge">{table.diceFormula}</span>
+			{/if}
+		</div>
+		<button class="collapse-button" on:click={toggleCollapse} title={isCollapsed ? 'Expand' : 'Collapse'}>
+			{isCollapsed ? '▶' : '▼'}
+		</button>
 	</div>
 
 	{#if table.description}
 		<p class="description">{table.description}</p>
 	{/if}
 
-	<div class="entries-preview">
-		<span class="entry-count">{table.entries.length} entries</span>
-		<button class="view-table-button" on:click={toggleTable}>
-			{showTable ? '▼ Hide Table' : '▶ View Table'}
-		</button>
-	</div>
+	{#if !isCollapsed}
 
-	{#if showTable}
 		<div class="table-view">
 			<table>
 				<thead>
@@ -108,21 +107,21 @@
 				</tbody>
 			</table>
 		</div>
-	{/if}
 
-	{#if lastResult}
-		<div class="result-display" class:rolling={isRolling}>
-			{#if lastResult.roll > 0}
-				<div class="roll-number">{lastResult.roll}</div>
-			{/if}
-			<div class="result-text">{lastResult.columns ? lastResult.columns.join(' | ') : ''}</div>
-		</div>
-	{/if}
+		{#if lastResult}
+			<div class="result-display" class:rolling={isRolling}>
+				{#if lastResult.roll > 0}
+					<div class="roll-number">{lastResult.roll}</div>
+				{/if}
+				<div class="result-text">{lastResult.columns ? lastResult.columns.join(' | ') : ''}</div>
+			</div>
+		{/if}
 
-	<button class="roll-button" on:click={handleRoll} disabled={isRolling}>
-		<img src={getDiceIconPath()} alt="Dice" class="dice-icon" />
-		{isRolling ? 'Rolling...' : 'Roll'}
-	</button>
+		<button class="roll-button" on:click={handleRoll} disabled={isRolling}>
+			<img src={getDiceIconPath()} alt="Dice" class="dice-icon" />
+			{isRolling ? 'Rolling...' : 'Roll'}
+		</button>
+	{/if}
 </div>
 
 <style>
@@ -131,15 +130,18 @@
 		border: 1px solid var(--border);
 		border-radius: 0.75rem;
 		padding: 1.5rem;
+		margin-bottom: 1rem;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		transition: transform 0.2s, box-shadow 0.2s;
+		transition: transform 0.2s, box-shadow 0.2s, padding 0.2s;
+		break-inside: avoid;
+		page-break-inside: avoid;
 	}
 
-	.table-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	.table-card.collapsed {
+		padding: 0.75rem 1rem;
+		gap: 0.5rem;
 	}
 
 	.card-header {
@@ -149,10 +151,41 @@
 		gap: 1rem;
 	}
 
+	.header-content {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		flex: 1;
+	}
+
 	.card-header h3 {
 		margin: 0;
 		font-size: 1.25rem;
 		color: var(--text);
+	}
+
+	.collapsed .card-header h3 {
+		font-size: 1rem;
+	}
+
+	.collapse-button {
+		background: transparent;
+		border: 1px solid var(--border);
+		color: var(--text-secondary);
+		padding: 0.5rem;
+		min-width: 40px;
+		min-height: 40px;
+		border-radius: 0.25rem;
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: all 0.2s;
+		flex-shrink: 0;
+	}
+
+	.collapse-button:hover {
+		background: var(--bg-tertiary);
+		color: var(--text);
+		border-color: var(--primary);
 	}
 
 	.dice-badge {
@@ -163,6 +196,7 @@
 		font-size: 0.875rem;
 		font-weight: 600;
 		font-family: 'Courier New', monospace;
+		display: inline-block;
 	}
 
 	.description {
@@ -171,59 +205,20 @@
 		margin: 0;
 	}
 
-	.entries-preview {
-		color: var(--text-secondary);
-		font-size: 0.875rem;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.entry-count {
-		background: var(--bg-tertiary);
-		padding: 0.25rem 0.75rem;
-		border-radius: 0.25rem;
-	}
-
-	.view-table-button {
-		background: transparent;
-		border: 1px solid var(--border);
-		color: var(--text-secondary);
-		padding: 0.5rem 1rem;
-		font-size: 0.875rem;
-		min-height: 44px;
-		transition: all 0.2s;
-	}
-
-	.view-table-button:hover {
-		background: var(--bg-tertiary);
-		color: var(--text);
-		border-color: var(--primary);
+	.collapsed .description {
+		font-size: 0.8125rem;
 	}
 
 	.table-view {
-		max-height: 400px;
-		overflow-y: auto;
 		border: 1px solid var(--border);
 		border-radius: 0.5rem;
-		animation: slideDown 0.2s ease-out;
-	}
-
-	@keyframes slideDown {
-		from {
-			opacity: 0;
-			max-height: 0;
-		}
-		to {
-			opacity: 1;
-			max-height: 400px;
-		}
+		overflow-x: auto;
 	}
 
 	table {
 		width: 100%;
 		border-collapse: collapse;
+		min-width: 100%;
 	}
 
 	thead {
@@ -334,6 +329,10 @@
 	@media (min-width: 768px) {
 		.table-card {
 			padding: 2rem;
+		}
+
+		.table-card.collapsed {
+			padding: 1rem 1.5rem;
 		}
 	}
 </style>

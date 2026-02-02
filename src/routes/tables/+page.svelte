@@ -158,15 +158,20 @@
 	}
 
 	.tables-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: 1.5rem;
+		column-count: 1;
+		column-gap: 1.5rem;
 	}
 
 	.table-card-wrapper {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
+		display: inline-block;
+		width: 100%;
+		break-inside: avoid;
+		page-break-inside: avoid;
+		margin-bottom: 1.5rem;
+	}
+
+	.table-card-wrapper > :first-child {
+		margin-bottom: 0.75rem;
 	}
 
 	.table-actions {
@@ -199,18 +204,15 @@
 		color: white;
 	}
 
-	/* Tablet and larger */
-	@media (min-width: 768px) {
-		.tables-grid {
-			grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-			gap: 2rem;
-		}
-	}
-
-	/* Extra large screens */
+	/* Large screens and up - 2 columns max */
 	@media (min-width: 1200px) {
 		.tables-grid {
-			grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+			column-count: 2;
+			column-gap: 2rem;
+		}
+
+		.tables-grid > * {
+			margin-bottom: 2rem;
 		}
 	}
 </style>

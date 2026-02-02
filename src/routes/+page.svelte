@@ -367,23 +367,27 @@
 	}
 
 	.tables-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: 1.5rem;
+		column-count: 1;
+		column-gap: 1.5rem;
 	}
 
-	/* Tablet and larger */
-	@media (min-width: 768px) {
-		.tables-grid {
-			grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-			gap: 2rem;
-		}
+	.tables-grid > * {
+		display: inline-block;
+		width: 100%;
+		break-inside: avoid;
+		page-break-inside: avoid;
+		margin-bottom: 1.5rem;
 	}
 
-	/* Extra large screens */
+	/* Large screens and up - 2 columns max */
 	@media (min-width: 1200px) {
 		.tables-grid {
-			grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+			column-count: 2;
+			column-gap: 2rem;
+		}
+
+		.tables-grid > * {
+			margin-bottom: 2rem;
 		}
 	}
 
