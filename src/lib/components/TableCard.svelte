@@ -16,7 +16,7 @@
 
 	let lastResult: { roll: number; columns: string[] } | null = null;
 	let isRolling = false;
-	let isCollapsed = false;
+	let isCollapsed = true;
 
 	// React to external collapse control
 	$: if (forceCollapsed !== undefined) {

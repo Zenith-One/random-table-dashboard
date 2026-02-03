@@ -3,13 +3,22 @@
 	import ImportExportDialog from '$lib/components/ImportExportDialog.svelte';
 
 	let showImportExport = false;
+
+	let title = "Random Table Dashboard"
 </script>
+
+<svelte:head>
+	<title>{title}</title>
+</svelte:head>
 
 <div class="app">
 	<header>
 		<div class="container">
 			<nav>
-				<h1>🎲 TTRPG Random Tables</h1>
+				<h1>
+					<img class="icon" src="./favicon.svg" alt="A d20 with the 20 side showing"/>
+					{title}
+				</h1>
 				<div class="nav-links">
 					<a href="./">Dashboards</a>
 					<a href="./tables">All Tables</a>
@@ -48,6 +57,12 @@
 	header {
 		background: var(--bg-secondary);
 		border-bottom: 1px solid var(--border);
+	}
+
+	header .icon {
+		height: 1.4em;
+		margin-right:0.25em;
+		vertical-align: middle;
 	}
 
 	nav {

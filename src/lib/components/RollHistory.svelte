@@ -3,7 +3,7 @@
 	import type { RollHistoryEntry } from '$lib/types';
 
 	let history: RollHistoryEntry[] = [];
-	let isCollapsed = false;
+	let isCollapsed = true;
 
 	rollHistory.subscribe(h => {
 		history = h;
