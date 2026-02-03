@@ -93,6 +93,20 @@
 
 	{#if !isCollapsed}
 
+		<button class="roll-button" on:click={handleRoll} disabled={isRolling}>
+			<img src={getDiceIconPath()} alt="Dice" class="dice-icon" />
+			{isRolling ? 'Rolling...' : 'Roll'}
+		</button>
+
+		{#if lastResult}
+			<div class="result-display" class:rolling={isRolling}>
+				{#if lastResult.roll > 0}
+					<div class="roll-number">{lastResult.roll}</div>
+				{/if}
+				<div class="result-text">{lastResult.columns ? lastResult.columns.join(' | ') : ''}</div>
+			</div>
+		{/if}
+
 		<div class="table-view">
 			<table>
 				<thead>
@@ -124,19 +138,6 @@
 			</table>
 		</div>
 
-		{#if lastResult}
-			<div class="result-display" class:rolling={isRolling}>
-				{#if lastResult.roll > 0}
-					<div class="roll-number">{lastResult.roll}</div>
-				{/if}
-				<div class="result-text">{lastResult.columns ? lastResult.columns.join(' | ') : ''}</div>
-			</div>
-		{/if}
-
-		<button class="roll-button" on:click={handleRoll} disabled={isRolling}>
-			<img src={getDiceIconPath()} alt="Dice" class="dice-icon" />
-			{isRolling ? 'Rolling...' : 'Roll'}
-		</button>
 	{/if}
 </div>
 
